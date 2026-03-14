@@ -2,6 +2,7 @@ package ru.athena.library_demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.athena.library_demo.api.dto.BookDto;
 import ru.athena.library_demo.api.dto.BookMapper;
 import ru.athena.library_demo.exceptions.BookReservedException;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class LibraryService {
 
     private final BooksRepository booksRepository;
