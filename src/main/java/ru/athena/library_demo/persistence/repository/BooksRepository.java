@@ -1,5 +1,6 @@
 package ru.athena.library_demo.persistence.repository;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListCrudRepository;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BooksRepository extends ListCrudRepository<Book, Long> {
+public interface BooksRepository extends ListCrudRepository<Book, Long>, JpaSpecificationExecutor<Book> {
 
     List<Book> findByAuthor(String author);
     List<Book> findByGenre(String genre);
