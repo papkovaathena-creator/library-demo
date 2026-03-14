@@ -4,20 +4,27 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 import ru.athena.library_demo.api.dto.BookDto;
 import ru.athena.library_demo.exceptions.BookReservedException;
 import ru.athena.library_demo.persistence.entity.Book;
 import ru.athena.library_demo.persistence.repository.BooksRepository;
+import ru.athena.library_demo.persistence.repository.specifications.BookSpecifications;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -111,5 +118,15 @@ public class LibraryServiceTests {
         when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
         Optional<BookDto> bookDtoOptional = libraryService.returnBook(bookId);
         Assertions.assertThat(bookDtoOptional.get().getReservedBy()).isNull();
+    }
+
+    @Test void LibraryService_findAll_BooksAreReturned() {
+        List<Book> books = List.of(
+                new Book(6L, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null),
+                new Book(7L, "Oedipus Rex", "Sophocles", "Tragedy", LocalDate.of(-429, 11, 24), null)
+        );
+        when(booksRepository.findAll(ArgumentMatchers.any(Specification.class))).thenReturn(books);
+        List<BookDto> bookDtos = libraryService.findAll(null, "Tragedy", null, null);
+        Assertions.assertThat(bookDtos.size()).isEqualTo(2);
     }
 }
