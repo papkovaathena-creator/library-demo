@@ -9,6 +9,7 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import ru.athena.library_demo.persistence.entity.Book;
 import ru.athena.library_demo.persistence.repository.BooksRepository;
+import ru.athena.library_demo.persistence.repository.specifications.BookSpecifications;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -87,43 +88,45 @@ public class BooksRepositoryTests {
 
     @Test
     public void BooksRepository_FindByAuthor_FindsBooks(){
-        List<Book> nonexistentBooks = booksRepository.findByAuthor("DoNotExist");
+        List<Book> nonexistentBooks = booksRepository.findAll(BookSpecifications.equalAuthor("DoNotExist"));
         Assertions.assertThat(nonexistentBooks.size()).isEqualTo(0);
-        List<Book> maupassantBooks = booksRepository.findByAuthor("Guy de Maupassant");
+        List<Book> maupassantBooks = booksRepository.findAll(BookSpecifications.equalAuthor("Guy de Maupassant"));
         Assertions.assertThat(maupassantBooks.size()).isEqualTo(2);
     }
 
     @Test
     public void BooksRepository_FindByGenre_FindsBooks(){
-        List<Book> nonexistentBooks = booksRepository.findByGenre("DoNotExist");
+        List<Book> nonexistentBooks = booksRepository.findAll(BookSpecifications.equalGenre("DoNotExist"));
         Assertions.assertThat(nonexistentBooks.size()).isEqualTo(0);
-        List<Book> magicalRealism = booksRepository.findByGenre("Magical Realism");
+        List<Book> magicalRealism = booksRepository.findAll(BookSpecifications.equalGenre("Magical Realism"));
         Assertions.assertThat(magicalRealism.size()).isEqualTo(2);
     }
 
     @Test
     public void BooksRepository_FindByAuthorAndGenre_FindsBooks(){
-        List<Book> nonexistentBooks = booksRepository.findByAuthorAndGenre("DoNotExist", "DoNotExist");
+        List<Book> nonexistentBooks = booksRepository.findAll(BookSpecifications.equalAuthor("DoNotExist")
+                .and(BookSpecifications.equalGenre("DoNotExist")));
         Assertions.assertThat(nonexistentBooks.size()).isEqualTo(0);
-        List<Book> horrorMaupassant = booksRepository.findByAuthorAndGenre("Guy de Maupassant", "Horror");
+        List<Book> horrorMaupassant = booksRepository.findAll(BookSpecifications.equalAuthor("Guy de Maupassant")
+                .and(BookSpecifications.equalGenre("Horror")));
         Assertions.assertThat(horrorMaupassant.size()).isEqualTo(1);
     }
 
     @Test
     public void BooksRepository_FindByReleaseDateAfter_FindsBooks(){
-        List<Book> books = booksRepository.findByReleaseDateAfter(LocalDate.of(1900,1,1));
+        List<Book> books = booksRepository.findAll(BookSpecifications.inYearSpan(LocalDate.of(1900,1,1), null));
         Assertions.assertThat(books.size()).isEqualTo(2);
     }
 
     @Test
     public void BooksRepository_FindByReleaseDateBefore_FindsBooks(){
-        List<Book> books = booksRepository.findByReleaseDateBefore(LocalDate.of(1900,1,1));
+        List<Book> books = booksRepository.findAll(BookSpecifications.inYearSpan(null, LocalDate.of(1900,1,1)));
         Assertions.assertThat(books.size()).isEqualTo(3);
     }
 
     @Test
     public void BooksRepository_FindByReleaseDateBetween_FindsBooks(){
-        List<Book> books = booksRepository.findByReleaseDateBetween(LocalDate.of(1800,1,1), LocalDate.of(1900,1,1));
+        List<Book> books = booksRepository.findAll(BookSpecifications.inYearSpan(LocalDate.of(1800,1,1), LocalDate.of(1900,1,1)));
         Assertions.assertThat(books.size()).isEqualTo(2);
     }
 
