@@ -15,6 +15,7 @@ import ru.athena.library_demo.persistence.repository.specifications.BookSpecific
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -70,7 +71,21 @@ public class LibraryService {
         return false;
     }
 
-    public List<BookDto> findAll(String author, String genre, LocalDate yearFrom, LocalDate yearTo){
+    public List<BookDto> findAll(Map<String, String> searchCriteria){
+
+        String author = null;
+        String genre = null;
+        String yearFromS = null;
+        String yearToS = null;
+        if (searchCriteria != null) {
+            author = searchCriteria.get("author");
+            genre = searchCriteria.get("genre");
+            yearFromS = searchCriteria.get("yearFrom");
+            yearToS = searchCriteria.get("yearTo");
+        }
+        LocalDate yearFrom = yearFromS == null ? null : LocalDate.of(Integer.parseInt(yearFromS),1,1);
+        LocalDate yearTo = yearToS == null ? null : LocalDate.of(Integer.parseInt(yearToS),1,1);
+
         Specification<Book> spec = Specification.unrestricted();
         if (author != null) spec = spec.and(BookSpecifications.equalAuthor(author));
         if (genre != null) spec = spec.and(BookSpecifications.equalGenre(genre));

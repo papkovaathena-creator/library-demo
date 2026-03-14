@@ -18,9 +18,7 @@ import ru.athena.library_demo.persistence.repository.specifications.BookSpecific
 
 import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.isA;
@@ -126,7 +124,9 @@ public class LibraryServiceTests {
                 new Book(7L, "Oedipus Rex", "Sophocles", "Tragedy", LocalDate.of(-429, 11, 24), null)
         );
         when(booksRepository.findAll(ArgumentMatchers.any(Specification.class))).thenReturn(books);
-        List<BookDto> bookDtos = libraryService.findAll(null, "Tragedy", null, null);
+        Map<String, String> paramMap = new HashMap<>();
+        paramMap.put("genre", "Tragedy");
+        List<BookDto> bookDtos = libraryService.findAll(paramMap);
         Assertions.assertThat(bookDtos.size()).isEqualTo(2);
     }
 }
