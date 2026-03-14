@@ -14,6 +14,7 @@ import ru.athena.library_demo.service.LibraryService;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -93,17 +94,9 @@ public class LibraryController {
     }
 
     @GetMapping
-    private ResponseEntity<List<BookDto>> findBooks(@RequestParam(required = false) String author,
-                                                    @RequestParam(required = false) String genre,
-                                                    @RequestParam(required = false) String yearFrom,
-                                                    @RequestParam(required = false) String yearTo)
+    private ResponseEntity<List<BookDto>> findBooks(@RequestParam(required = false) Map<String, String> searchCriteria)
     {
-        LocalDate yearFromDate = yearFrom == null ? null : LocalDate.of(Integer.parseInt(yearFrom),1,1);
-        LocalDate yearToDate = yearTo == null ? null : LocalDate.of(Integer.parseInt(yearTo),1,1);
-        List<BookDto> bookDtos = libraryService.findAll(author
-                , genre
-                , yearFromDate
-                , yearToDate);
+        List<BookDto> bookDtos = libraryService.findAll(searchCriteria);
         return ResponseEntity.ok(bookDtos);
     }
 }
