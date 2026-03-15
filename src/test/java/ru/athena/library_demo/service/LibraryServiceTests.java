@@ -9,6 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import ru.athena.library_demo.api.dto.BookDto;
 import ru.athena.library_demo.exceptions.BookReservedException;
@@ -123,10 +127,11 @@ public class LibraryServiceTests {
                 new Book(6L, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null),
                 new Book(7L, "Oedipus Rex", "Sophocles", "Tragedy", LocalDate.of(-429, 11, 24), null)
         );
-        when(booksRepository.findAll(ArgumentMatchers.any(Specification.class))).thenReturn(books);
+        Page<Book> bookPage = new PageImpl<>(books);
+        when(booksRepository.findAll(ArgumentMatchers.any(Specification.class),ArgumentMatchers.any(Pageable.class))).thenReturn(bookPage);
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("genre", "Tragedy");
-        List<BookDto> bookDtos = libraryService.findAll(paramMap);
-        Assertions.assertThat(bookDtos.size()).isEqualTo(2);
+        Page<BookDto> bookDtos = libraryService.findAll(paramMap, PageRequest.of(0,10));
+        Assertions.assertThat(bookDtos.getSize()).isEqualTo(2);
     }
 }

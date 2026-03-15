@@ -2,6 +2,10 @@ package ru.athena.library_demo.service;
 
 import org.springframework.beans.factory.BeanRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +75,7 @@ public class LibraryService {
         return false;
     }
 
-    public List<BookDto> findAll(Map<String, String> searchCriteria){
+    public Page<BookDto> findAll(Map<String, String> searchCriteria, Pageable pageable){
 
         String author = null;
         String genre = null;
@@ -90,7 +94,7 @@ public class LibraryService {
         if (author != null) spec = spec.and(BookSpecifications.equalAuthor(author));
         if (genre != null) spec = spec.and(BookSpecifications.equalGenre(genre));
         if (yearFrom != null || yearTo != null) spec = spec.and(BookSpecifications.inYearSpan(yearFrom, yearTo));
-        List<Book> books = booksRepository.findAll(spec);
+        Page<Book> books = booksRepository.findAll(spec, pageable);
         return BookMapper.map(books);
     }
 

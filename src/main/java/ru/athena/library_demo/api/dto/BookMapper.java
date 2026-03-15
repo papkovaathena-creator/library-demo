@@ -1,5 +1,7 @@
 package ru.athena.library_demo.api.dto;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
 import ru.athena.library_demo.persistence.entity.Book;
 
@@ -31,5 +33,13 @@ public class BookMapper {
                 .map(BookMapper::map)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+    }
+
+    public static Page<BookDto> map(Page<Book> books) {
+        List<BookDto> bookList = books.stream()
+                .map(BookMapper::map)
+                .map(Optional::get)
+                .toList();
+        return new PageImpl<>(bookList);
     }
 }

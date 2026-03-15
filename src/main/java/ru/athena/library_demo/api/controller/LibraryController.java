@@ -1,6 +1,9 @@
 package ru.athena.library_demo.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -94,9 +97,14 @@ public class LibraryController {
     }
 
     @GetMapping
-    private ResponseEntity<List<BookDto>> findBooks(@RequestParam(required = false) Map<String, String> searchCriteria)
+    private ResponseEntity<Page<BookDto>> findBooks(@RequestParam(required = false) Map<String, String> searchCriteria)
     {
-        List<BookDto> bookDtos = libraryService.findAll(searchCriteria);
+        int pageNo = searchCriteria != null && searchCriteria.get("pageNo") != null
+                ? Integer.parseInt(searchCriteria.get("pageNo")) : 0;
+        int pageSize = searchCriteria != null && searchCriteria.get("pageSize") != null
+                ? Integer.parseInt(searchCriteria.get("pageSize")) : 0;
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<BookDto> bookDtos = libraryService.findAll(searchCriteria, pageable);
         return ResponseEntity.ok(bookDtos);
     }
 }
