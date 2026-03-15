@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -44,7 +45,8 @@ public class LibraryController {
 
 
     @PostMapping
-    private ResponseEntity<BookDto> createBook(@RequestBody BookDto newBookRequest, UriComponentsBuilder ucb) {
+    // Throws 403 instead of 400?
+    private ResponseEntity<BookDto> createBook(@Validated @RequestBody BookDto newBookRequest, UriComponentsBuilder ucb) {
         BookDto savedBook = libraryService.saveBook(newBookRequest);
         URI locationOfNewCashCard = ucb
                 .path("books/{id}")
