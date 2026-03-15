@@ -1,6 +1,8 @@
 package ru.athena.library_demo.api.dto;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import ru.athena.library_demo.persistence.entity.Book;
 
 import java.time.LocalDate;
@@ -10,10 +12,15 @@ import java.util.Optional;
 public class BookDto {
 
     private Long id;
+    @NotBlank(message = "Name is mandatory.")
+    @Size(max = 50)
     private String name;
+    @Size(max = 50)
     private String author;
+    @Size(max = 50)
     private String genre;
     private LocalDate releaseDate;
+    @Size(max = 50)
     private String reservedBy;
 
     public BookDto() {
