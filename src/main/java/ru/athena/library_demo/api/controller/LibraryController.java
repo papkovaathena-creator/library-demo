@@ -40,7 +40,7 @@ public class LibraryController {
     @GetMapping("/{requestedId}")
     private ResponseEntity<BookDto> findById(@PathVariable Long requestedId) {
         Optional<BookDto> book = libraryService.findById(requestedId);
-        return book.map(ResponseEntity::ok).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Book not found."));
+        return book.map(ResponseEntity::ok).orElseThrow(() -> new NoSuchElementException("No such book in the library."));
     }
 
 
@@ -62,36 +62,24 @@ public class LibraryController {
     }
 
     @DeleteMapping("/{requestedId}")
-    private ResponseEntity<Void> deleteBook(@PathVariable Long requestedId) {
-        try {
-            if (libraryService.deleteBook(requestedId)) {
-                return ResponseEntity.noContent().build();
-            }
-        } catch (BookReservedException e) {
-            throw new ResponseStatusException(CONFLICT, "Book is reserved.");
-        }
-        return ResponseEntity.notFound().build();
+    private ResponseEntity<Void> deleteBook(@PathVariable Long requestedId) throws BookReservedException {
+        libraryService.deleteBook(requestedId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{requestedId}/reserve")
-    private ResponseEntity<BookDto> reserveBook(@PathVariable Long requestedId, UriComponentsBuilder ucb) {
-        try {
-            Optional<BookDto> savedBook = libraryService.reserveBook(requestedId);
-            if (savedBook.isEmpty()) throw new ResponseStatusException(NOT_FOUND, "Book not found.");
-            URI locationOfNewCashCard = ucb
-                    .path("books/{id}")
-                    .buildAndExpand(savedBook.get().getId())
-                    .toUri();
-            return ResponseEntity.status(HttpStatus.CREATED).header("Location", locationOfNewCashCard.toString()).body(savedBook.get());
-        } catch (BookReservedException e) {
-            throw new ResponseStatusException(CONFLICT, "Book is already reserved.");
-        }
+    private ResponseEntity<BookDto> reserveBook(@PathVariable Long requestedId, UriComponentsBuilder ucb) throws BookReservedException {
+        Optional<BookDto> savedBook = libraryService.reserveBook(requestedId);
+        URI locationOfNewCashCard = ucb
+                .path("books/{id}")
+                .buildAndExpand(savedBook.get().getId())
+                .toUri();
+        return ResponseEntity.status(HttpStatus.CREATED).header("Location", locationOfNewCashCard.toString()).body(savedBook.get());
     }
 
     @PostMapping("/{requestedId}/return")
     private ResponseEntity<BookDto> returnBook(@PathVariable Long requestedId, UriComponentsBuilder ucb) {
         Optional<BookDto> savedBook = libraryService.returnBook(requestedId);
-        if (savedBook.isEmpty()) throw new ResponseStatusException(NOT_FOUND, "Book not found.");
         URI locationOfNewCashCard = ucb
                 .path("books/{id}")
                 .buildAndExpand(savedBook.get().getId())

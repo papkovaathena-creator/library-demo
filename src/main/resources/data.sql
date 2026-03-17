@@ -7,4 +7,4 @@ INSERT INTO books (id, name, author, genre, release_date, reserved)
 INSERT INTO books (id, name, author, genre, release_date, reserved)
     VALUES (default, 'Une vie', 'Guy de Maupassant','Romance', '1883-01-01', null);
 INSERT INTO books (id, name, author, genre, release_date, reserved)
-    VALUES (default, 'La Divina Comedia', 'Dante Alighieri','Epic', '1321-01-01', null);
+    VALUES (default, 'La Divina Comedia', 'Dante Alighieri','Epic', '1321-01-01', 'Reserver');
