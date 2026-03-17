@@ -127,23 +127,31 @@ public class LibraryServiceTests {
     }
 
     @Test
-    public void LibraryService_ReturnBook_BookIsReturned() {
+    public void LibraryService_ReturnBook_BookIsReturned() throws BookReservedException {
         Long bookId = 6L;
-        Book book = new Book(bookId, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), "Reserver");
+        Book book = new Book(bookId, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), "Tester");
         when(booksRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
-        Optional<BookDto> bookDtoOptional = libraryService.returnBook(bookId);
+        Optional<BookDto> bookDtoOptional = libraryService.returnBook(bookId, "Tester");
         Assertions.assertThat(bookDtoOptional.get().getReservedBy()).isNull();
     }
 
     @Test
-    public void LibraryServive_ReturnBook_NonReservedBookNoReaction() {
+    public void LibraryServive_ReturnBook_NonReservedBookNoReaction() throws BookReservedException {
         Long bookId = 6L;
         Book book = new Book(bookId, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
         when(booksRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
-        Optional<BookDto> bookDtoOptional = libraryService.returnBook(bookId);
+        Optional<BookDto> bookDtoOptional = libraryService.returnBook(bookId, "Tester");
         Assertions.assertThat(bookDtoOptional.get().getReservedBy()).isNull();
+    }
+
+    @Test
+    public void LibraryServive_ReturnBook_BookReservedByAnother() throws BookReservedException {
+        Long bookId = 6L;
+        Book book = new Book(bookId, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), "Admin");
+        when(booksRepository.findById(bookId)).thenReturn(Optional.of(book));
+        Assertions.assertThatThrownBy(()->libraryService.returnBook(bookId, "Tester")).isInstanceOf(BookReservedException.class);
     }
 
     @Test

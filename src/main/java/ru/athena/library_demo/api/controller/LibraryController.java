@@ -80,8 +80,9 @@ public class LibraryController {
     }
 
     @PostMapping("/{requestedId}/return")
-    public ResponseEntity<BookDto> returnBook(@PathVariable Long requestedId, UriComponentsBuilder ucb) {
-        Optional<BookDto> savedBook = libraryService.returnBook(requestedId);
+    public ResponseEntity<BookDto> returnBook(@PathVariable Long requestedId, UriComponentsBuilder ucb) throws BookReservedException {
+        String returnerName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<BookDto> savedBook = libraryService.returnBook(requestedId, returnerName);
         URI locationOfNewCashCard = ucb
                 .path("books/{id}")
                 .buildAndExpand(savedBook.get().getId())

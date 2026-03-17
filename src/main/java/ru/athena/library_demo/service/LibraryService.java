@@ -61,7 +61,7 @@ public class LibraryService {
         return BookMapper.map(booksRepository.save(book));
     }
 
-    public Optional<BookDto> returnBook(Long id) {
+    public Optional<BookDto> returnBook(Long id, String reserverName) throws BookReservedException {
         log.info("Attempting to return a book with id {}.", id);
         Optional<Book> bookOptional = booksRepository.findById(id);
         if (bookOptional.isEmpty()) {
@@ -69,6 +69,10 @@ public class LibraryService {
             throw new NoSuchElementException("No such book in the library.");
         }
         Book book = bookOptional.get();
+        if (book.getReserved() != null & !reserverName.equals(book.getReserved())) {
+            log.error("The book {} by {}(id - {}) is reserved by {}.", book.getName(), book.getAuthor(), book.getId(), reserverName);
+            throw new BookReservedException("This book is reserved by " + reserverName + ".");
+        }
         book.setReserved(null);
         log.info("The book {} by {}(id - {}) is successfully returned.", book.getName(), book.getAuthor(), book.getId());
         return BookMapper.map(booksRepository.save(book));
