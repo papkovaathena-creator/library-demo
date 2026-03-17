@@ -110,7 +110,7 @@ public class LibraryControllerTests {
     @Test
     public void LibraryController_DeleteBook_CannotDeleteReservedBook() throws Exception {
         long bookId = 6L;
-        when(libraryService.deleteBook(ArgumentMatchers.anyLong())).thenThrow(new BookReservedException());
+        when(libraryService.deleteBook(ArgumentMatchers.anyLong())).thenThrow(new BookReservedException("This book has been reserved."));
 
         ResultActions response = mockMvc.perform(delete("/books/" + bookId)
                 .contentType(MediaType.APPLICATION_JSON));

@@ -17,10 +17,7 @@ import ru.athena.library_demo.persistence.repository.BooksRepository;
 import ru.athena.library_demo.persistence.repository.specifications.BookSpecifications;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -44,16 +41,16 @@ public class LibraryService {
 
     public Optional<BookDto> reserveBook(Long id) throws BookReservedException {
         Optional<Book> bookOptional = booksRepository.findById(id);
-        if (bookOptional.isEmpty()) return Optional.empty();
+        if (bookOptional.isEmpty()) throw new NoSuchElementException("No such book in the library.");
         Book book = bookOptional.get();
-        if (book.getReserved() != null) throw new BookReservedException();
+        if (book.getReserved() != null) throw new BookReservedException("This book is already reserved.");
         book.setReserved("Reserver");
         return BookMapper.map(booksRepository.save(book));
     }
 
     public Optional<BookDto> returnBook(Long id) {
         Optional<Book> bookOptional = booksRepository.findById(id);
-        if (bookOptional.isEmpty()) return Optional.empty();
+        if (bookOptional.isEmpty()) throw new NoSuchElementException("No such book in the library.");
         Book book = bookOptional.get();
         book.setReserved(null);
         return BookMapper.map(booksRepository.save(book));
@@ -67,12 +64,10 @@ public class LibraryService {
 
     public boolean deleteBook(Long id) throws BookReservedException {
         Optional<String> reserved = booksRepository.findFirstReservedById(id);
-        if (reserved.isPresent()) {
-            if (!reserved.get().equals("NotReserved")) throw new BookReservedException();
-            booksRepository.deleteById(id);
-            return true;
-        }
-        return false;
+        if (reserved.isEmpty()) throw new NoSuchElementException("No such book in the library.");
+        if (!reserved.get().equals("NotReserved")) throw new BookReservedException("This book has been reserved.");
+        booksRepository.deleteById(id);
+        return true;
     }
 
     public Page<BookDto> findAll(Map<String, String> searchCriteria, Pageable pageable){
