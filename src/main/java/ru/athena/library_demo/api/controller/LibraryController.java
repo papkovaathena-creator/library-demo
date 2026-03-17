@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -69,7 +70,8 @@ public class LibraryController {
 
     @PostMapping("/{requestedId}/reserve")
     public ResponseEntity<BookDto> reserveBook(@PathVariable Long requestedId, UriComponentsBuilder ucb) throws BookReservedException {
-        Optional<BookDto> savedBook = libraryService.reserveBook(requestedId);
+        String reserverName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<BookDto> savedBook = libraryService.reserveBook(requestedId, reserverName);
         URI locationOfNewCashCard = ucb
                 .path("books/{id}")
                 .buildAndExpand(savedBook.get().getId())

@@ -44,7 +44,7 @@ public class LibraryService {
         return BookMapper.map(booksRepository.save(BookMapper.reverseMap(book))).orElse(null);
     }
 
-    public Optional<BookDto> reserveBook(Long id) throws BookReservedException {
+    public Optional<BookDto> reserveBook(Long id, String reserverName) throws BookReservedException {
         log.info("Attempting to reserve a book {}.", id);
         Optional<Book> bookOptional = booksRepository.findById(id);
         if (bookOptional.isEmpty()) {
@@ -56,7 +56,7 @@ public class LibraryService {
             log.error("The book {} by {}(id - {}) is already reserved.", book.getName(), book.getAuthor(), book.getId());
             throw new BookReservedException("This book is already reserved.");
         }
-        book.setReserved("Reserver");
+        book.setReserved(reserverName);
         log.info("The book {} by {}(id - {}) is successfully reserved.", book.getName(), book.getAuthor(), book.getId());
         return BookMapper.map(booksRepository.save(book));
     }

@@ -108,26 +108,22 @@ public class LibraryServiceTests {
     }
 
     @Test
-    public void LibraryService_ReserveBook_BookIsReserved(){
+    public void LibraryService_ReserveBook_BookIsReserved() throws BookReservedException {
         Long bookId = 6L;
         Book book = new Book(bookId, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
         when(booksRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
 
-        try {
-            Optional<BookDto> bookDtoOptional = libraryService.reserveBook(bookId);
-            Assertions.assertThat(bookDtoOptional.get().getReservedBy()).isEqualTo("Reserver");
-        } catch (BookReservedException e) {
-            throw new RuntimeException(e);
-        }
+        Optional<BookDto> bookDtoOptional = libraryService.reserveBook(bookId, "Tester");
+        Assertions.assertThat(bookDtoOptional.get().getReservedBy()).isEqualTo("Tester");
     }
 
     @Test
     public void LibraryService_ReserveBook_CannotReserveReservedBook(){
         Long bookId = 6L;
-        Book book = new Book(bookId, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), "Reserver");
+        Book book = new Book(bookId, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), "Tester");
         when(booksRepository.findById(bookId)).thenReturn(Optional.of(book));
-        Assertions.assertThatThrownBy(()->libraryService.reserveBook(bookId)).isInstanceOf(BookReservedException.class);
+        Assertions.assertThatThrownBy(()->libraryService.reserveBook(bookId, "Tester")).isInstanceOf(BookReservedException.class);
     }
 
     @Test

@@ -5,11 +5,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -122,30 +126,44 @@ public class LibraryControllerTests {
     public void LibraryController_ReserveBook_BookReserved() throws Exception {
         long bookId = 6L;
         bookDto.setId(bookId);
-        given(libraryService.reserveBook(ArgumentMatchers.anyLong())).willAnswer(invocation -> {
-            bookDto.setReservedBy("Reserver");
+
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        given(SecurityContextHolder.getContext().getAuthentication().getName())
+                .willAnswer(invocation -> "Tester");
+
+        given(libraryService.reserveBook(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString())).willAnswer(invocation -> {
+            bookDto.setReservedBy("Tester");
             return Optional.of(bookDto);
         });
 
         ResultActions response = mockMvc.perform(post("/books/" + bookId + "/reserve")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(bookDto)));
+                .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.header().string("Location","http://localhost/books/" + bookId))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.reservedBy", CoreMatchers.is("Reserver")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reservedBy", CoreMatchers.is("Tester")));
     }
 
     @Test
     public void LibraryController_ReserveBook_BookNotFound() throws Exception {
         long bookId = 6L;
         bookDto.setId(bookId);
-        given(libraryService.reserveBook(ArgumentMatchers.anyLong()))
+
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        given(SecurityContextHolder.getContext().getAuthentication().getName())
+                .willAnswer(invocation -> "Tester");
+
+        given(libraryService.reserveBook(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString()))
                 .willAnswer(invocation -> Optional.empty());
 
         ResultActions response = mockMvc.perform(post("/books/" + bookId + "/reserve")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(bookDto)));
+                .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
@@ -154,11 +172,18 @@ public class LibraryControllerTests {
     public void LibraryController_ReserveBook_BookWasAlreadyReserved() throws Exception {
         long bookId = 6L;
         bookDto.setId(bookId);
-        when(libraryService.reserveBook(bookId)).thenThrow(new BookReservedException());
+
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        given(SecurityContextHolder.getContext().getAuthentication().getName())
+                .willAnswer(invocation -> "Tester");
+
+        when(libraryService.reserveBook(bookId, "Tester")).thenThrow(new BookReservedException());
 
         ResultActions response = mockMvc.perform(post("/books/" + bookId + "/reserve")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(bookDto)));
+                .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(MockMvcResultMatchers.status().isConflict());
     }
