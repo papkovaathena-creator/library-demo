@@ -81,7 +81,7 @@ public class LibraryService {
     public void putBook(BookDto bookUpdate, Long requestedId) {
         log.info("Creating or updating a book - {} by {}.", bookUpdate.getName(), bookUpdate.getAuthor());
         Optional<BookDto> book = this.findById(requestedId);
-        BookDto updatedBook = new BookDto(book.map(BookDto::getId).orElse(null), bookUpdate.getName(), bookUpdate.getAuthor(), bookUpdate.getGenre(), bookUpdate.getReleaseDate(), null);
+        BookDto updatedBook = new BookDto(book.map(BookDto::getId).orElse(null), bookUpdate.getName(), bookUpdate.getAuthor(), bookUpdate.getGenre(), bookUpdate.getReleaseDate(), book.map(BookDto::getReservedBy).orElse(null));
         this.saveBook(updatedBook);
     }
 
