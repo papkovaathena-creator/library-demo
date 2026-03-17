@@ -53,11 +53,22 @@ public class LibraryServiceTests {
     }
 
     @Test
-    public void LibraryService_PutBook_NoException(){
-        Book book = new Book(null, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
+    public void LibraryService_PutBook_BookFoundNoException(){
+        Book book = new Book(6L, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
         BookDto bookDto = new BookDto(null, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
 
         when(booksRepository.findById(6L)).thenReturn(Optional.ofNullable(book));
+        when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
+
+        assertAll(()->libraryService.putBook(bookDto, 6L));
+    }
+
+    @Test
+    public void LibraryService_PutBook_BookNotFoundNoException(){
+        Book book = new Book(6L, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
+        BookDto bookDto = new BookDto(null, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
+
+        when(booksRepository.findById(6L)).thenReturn(Optional.empty());
         when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
 
         assertAll(()->libraryService.putBook(bookDto, 6L));
@@ -87,6 +98,13 @@ public class LibraryServiceTests {
         when(booksRepository.findFirstReservedById(6L)).thenReturn(Optional.of("Reserver"));
 
         Assertions.assertThatThrownBy(() -> libraryService.deleteBook(6L)).isInstanceOf(BookReservedException.class);
+    }
+
+    @Test
+    public void LibraryService_DeleteBook_CannotDeleteNonexistentBook() throws BookReservedException {
+        when(booksRepository.findFirstReservedById(6L)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> libraryService.deleteBook(6L)).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -122,7 +140,18 @@ public class LibraryServiceTests {
         Assertions.assertThat(bookDtoOptional.get().getReservedBy()).isNull();
     }
 
-    @Test void LibraryService_findAll_BooksAreReturned() {
+    @Test
+    public void LibraryServive_ReturnBook_NonReservedBookNoReaction() {
+        Long bookId = 6L;
+        Book book = new Book(bookId, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
+        when(booksRepository.findById(bookId)).thenReturn(Optional.of(book));
+        when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
+        Optional<BookDto> bookDtoOptional = libraryService.returnBook(bookId);
+        Assertions.assertThat(bookDtoOptional.get().getReservedBy()).isNull();
+    }
+
+    @Test
+    public void LibraryService_findAll_BooksAreReturned() {
         List<Book> books = List.of(
                 new Book(6L, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null),
                 new Book(7L, "Oedipus Rex", "Sophocles", "Tragedy", LocalDate.of(-429, 11, 24), null)
@@ -134,4 +163,5 @@ public class LibraryServiceTests {
         Page<BookDto> bookDtos = libraryService.findAll(paramMap, PageRequest.of(0,10));
         Assertions.assertThat(bookDtos.getSize()).isEqualTo(2);
     }
+
 }
