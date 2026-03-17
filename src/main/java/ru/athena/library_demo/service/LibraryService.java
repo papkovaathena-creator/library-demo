@@ -1,5 +1,7 @@
 package ru.athena.library_demo.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
@@ -23,6 +25,8 @@ import java.util.*;
 @Transactional
 public class LibraryService {
 
+    private static final Logger log = LoggerFactory.getLogger(LibraryService.class);
+
     private final BooksRepository booksRepository;
 
     @Autowired
@@ -36,37 +40,60 @@ public class LibraryService {
     }
 
     public BookDto saveBook(BookDto book) {
+        log.info("Creating a book - {} by {}.", book.getName(), book.getAuthor());
         return BookMapper.map(booksRepository.save(BookMapper.reverseMap(book))).orElse(null);
     }
 
     public Optional<BookDto> reserveBook(Long id) throws BookReservedException {
+        log.info("Attempting to reserve a book {}.", id);
         Optional<Book> bookOptional = booksRepository.findById(id);
-        if (bookOptional.isEmpty()) throw new NoSuchElementException("No such book in the library.");
+        if (bookOptional.isEmpty()) {
+            log.error("Found no book with id - {}.", id);
+            throw new NoSuchElementException("No such book in the library.");
+        }
         Book book = bookOptional.get();
-        if (book.getReserved() != null) throw new BookReservedException("This book is already reserved.");
+        if (book.getReserved() != null) {
+            log.error("The book {} by {}(id - {}) is already reserved.", book.getName(), book.getAuthor(), book.getId());
+            throw new BookReservedException("This book is already reserved.");
+        }
         book.setReserved("Reserver");
+        log.info("The book {} by {}(id - {}) is successfully reserved.", book.getName(), book.getAuthor(), book.getId());
         return BookMapper.map(booksRepository.save(book));
     }
 
     public Optional<BookDto> returnBook(Long id) {
+        log.info("Attempting to return a book with id {}.", id);
         Optional<Book> bookOptional = booksRepository.findById(id);
-        if (bookOptional.isEmpty()) throw new NoSuchElementException("No such book in the library.");
+        if (bookOptional.isEmpty()) {
+            log.error("Found no book with id {}.", id);
+            throw new NoSuchElementException("No such book in the library.");
+        }
         Book book = bookOptional.get();
         book.setReserved(null);
+        log.info("The book {} by {}(id - {}) is successfully returned.", book.getName(), book.getAuthor(), book.getId());
         return BookMapper.map(booksRepository.save(book));
     }
 
     public void putBook(BookDto bookUpdate, Long requestedId) {
+        log.info("Creating or updating a book - {} by {}.", bookUpdate.getName(), bookUpdate.getAuthor());
         Optional<BookDto> book = this.findById(requestedId);
         BookDto updatedBook = new BookDto(book.map(BookDto::getId).orElse(null), bookUpdate.getName(), bookUpdate.getAuthor(), bookUpdate.getGenre(), bookUpdate.getReleaseDate(), null);
         this.saveBook(updatedBook);
     }
 
     public boolean deleteBook(Long id) throws BookReservedException {
+        log.info("Attempting to delete a book with id {}.", id);
         Optional<String> reserved = booksRepository.findFirstReservedById(id);
-        if (reserved.isEmpty()) throw new NoSuchElementException("No such book in the library.");
-        if (!reserved.get().equals("NotReserved")) throw new BookReservedException("This book has been reserved.");
+        if (reserved.isEmpty()) {
+            log.error("Found no book with id {}.", id);
+            throw new NoSuchElementException("No such book in the library.");
+        }
+        if (!reserved.get().equals("NotReserved")) {
+            log.error("The book with id {} is reserved.", id);
+            throw new BookReservedException("This book has been reserved.");
+        }
         booksRepository.deleteById(id);
+        log.info("Book with id {} has been successfully deleted.", id);
         return true;
     }
 
