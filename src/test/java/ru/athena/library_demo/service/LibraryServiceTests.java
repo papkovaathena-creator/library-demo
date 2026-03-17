@@ -1,7 +1,6 @@
 package ru.athena.library_demo.service;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -18,15 +17,12 @@ import ru.athena.library_demo.api.dto.BookDto;
 import ru.athena.library_demo.exceptions.BookReservedException;
 import ru.athena.library_demo.persistence.entity.Book;
 import ru.athena.library_demo.persistence.repository.BooksRepository;
-import ru.athena.library_demo.persistence.repository.specifications.BookSpecifications;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 

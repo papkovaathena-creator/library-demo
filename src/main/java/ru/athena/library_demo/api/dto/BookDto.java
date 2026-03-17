@@ -1,13 +1,9 @@
 package ru.athena.library_demo.api.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import ru.athena.library_demo.persistence.entity.Book;
 
 import java.time.LocalDate;
-import java.util.Locale;
-import java.util.Optional;
 
 public class BookDto {
 

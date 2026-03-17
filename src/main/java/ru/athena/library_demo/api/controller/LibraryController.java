@@ -10,21 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.athena.library_demo.api.dto.BookDto;
 import ru.athena.library_demo.api.dto.SortDto;
 import ru.athena.library_demo.api.dto.SortMapper;
 import ru.athena.library_demo.exceptions.BookReservedException;
-import ru.athena.library_demo.persistence.entity.Book;
 import ru.athena.library_demo.service.LibraryService;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.*;
-
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
 @RequestMapping("/books")
@@ -49,11 +43,11 @@ public class LibraryController {
     // Throws 403 instead of 400?
     public ResponseEntity<BookDto> createBook(@Validated @RequestBody BookDto newBookRequest, UriComponentsBuilder ucb) {
         BookDto savedBook = libraryService.saveBook(newBookRequest);
-        URI locationOfNewCashCard = ucb
+        URI locationOfNewBook = ucb
                 .path("books/{id}")
                 .buildAndExpand(savedBook.getId())
                 .toUri();
-        return ResponseEntity.status(HttpStatus.CREATED).header("Location", locationOfNewCashCard.toString()).body(savedBook);
+        return ResponseEntity.status(HttpStatus.CREATED).header("Location", locationOfNewBook.toString()).body(savedBook);
     }
 
     @PutMapping("/{requestedId}")
@@ -72,22 +66,22 @@ public class LibraryController {
     public ResponseEntity<BookDto> reserveBook(@PathVariable Long requestedId, UriComponentsBuilder ucb) throws BookReservedException {
         String reserverName = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<BookDto> savedBook = libraryService.reserveBook(requestedId, reserverName);
-        URI locationOfNewCashCard = ucb
+        URI locationOfNewBook = ucb
                 .path("books/{id}")
                 .buildAndExpand(savedBook.get().getId())
                 .toUri();
-        return ResponseEntity.status(HttpStatus.CREATED).header("Location", locationOfNewCashCard.toString()).body(savedBook.get());
+        return ResponseEntity.status(HttpStatus.CREATED).header("Location", locationOfNewBook.toString()).body(savedBook.get());
     }
 
     @PostMapping("/{requestedId}/return")
     public ResponseEntity<BookDto> returnBook(@PathVariable Long requestedId, UriComponentsBuilder ucb) throws BookReservedException {
         String returnerName = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<BookDto> savedBook = libraryService.returnBook(requestedId, returnerName);
-        URI locationOfNewCashCard = ucb
+        URI locationOfNewBook = ucb
                 .path("books/{id}")
                 .buildAndExpand(savedBook.get().getId())
                 .toUri();
-        return ResponseEntity.status(HttpStatus.CREATED).header("Location", locationOfNewCashCard.toString()).body(savedBook.get());
+        return ResponseEntity.status(HttpStatus.CREATED).header("Location", locationOfNewBook.toString()).body(savedBook.get());
     }
 
     @GetMapping
