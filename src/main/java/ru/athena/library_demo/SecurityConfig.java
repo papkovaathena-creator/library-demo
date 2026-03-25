@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/books/**").hasAnyRole("LIBRARIAN")
                         .requestMatchers(HttpMethod.DELETE,"/books/**").hasAnyRole("LIBRARIAN")
                         .requestMatchers(HttpMethod.GET,"/books").hasAnyRole("READER","LIBRARIAN")
+                        .requestMatchers(HttpMethod.GET,"/actuator/**").hasAnyRole("LIBRARIAN")
                         .anyRequest().denyAll())
                 .httpBasic(Customizer.withDefaults());
         return http.csrf(AbstractHttpConfigurer::disable).build();
