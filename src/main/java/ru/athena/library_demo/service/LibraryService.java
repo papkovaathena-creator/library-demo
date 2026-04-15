@@ -8,8 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.athena.library_demo.api.dto.BookDto;
 import ru.athena.library_demo.api.dto.BookMapper;
+import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.exceptions.BookReservedException;
 import ru.athena.library_demo.persistence.entity.Book;
 import ru.athena.library_demo.persistence.repository.BooksRepository;
@@ -78,7 +78,12 @@ public class LibraryService {
     public void putBook(BookDto bookUpdate, Long requestedId) {
         log.info("Creating or updating a book - {} by {}.", bookUpdate.getName(), bookUpdate.getAuthor());
         Optional<BookDto> book = this.findById(requestedId);
-        BookDto updatedBook = new BookDto(book.map(BookDto::getId).orElse(null), bookUpdate.getName(), bookUpdate.getAuthor(), bookUpdate.getGenre(), bookUpdate.getReleaseDate(), book.map(BookDto::getReservedBy).orElse(null));
+        BookDto updatedBook = new BookDto(bookUpdate.getName());
+        updatedBook.setId(book.map(BookDto::getId).orElse(null));
+        updatedBook.setAuthor(bookUpdate.getAuthor());
+        updatedBook.setGenre(bookUpdate.getGenre());
+        updatedBook.setReleaseDate(bookUpdate.getReleaseDate());
+        updatedBook.setReservedBy(book.map(BookDto::getReservedBy).orElse(null));
         this.saveBook(updatedBook);
     }
 
@@ -98,18 +103,30 @@ public class LibraryService {
         return true;
     }
 
-    public Page<BookDto> findAll(Map<String, String> searchCriteria, Pageable pageable){
+//    public Page<BookDto> findAll(Map<String, String> searchCriteria, Pageable pageable){
+//
+//        String author = null;
+//        String genre = null;
+//        String yearFromS = null;
+//        String yearToS = null;
+//        if (searchCriteria != null) {
+//            author = searchCriteria.get("author");
+//            genre = searchCriteria.get("genre");
+//            yearFromS = searchCriteria.get("yearFrom");
+//            yearToS = searchCriteria.get("yearTo");
+//        }
+//        LocalDate yearFrom = yearFromS == null ? null : LocalDate.of(Integer.parseInt(yearFromS),1,1);
+//        LocalDate yearTo = yearToS == null ? null : LocalDate.of(Integer.parseInt(yearToS),1,1);
+//
+//        Specification<Book> spec = Specification.unrestricted();
+//        if (author != null) spec = spec.and(BookSpecifications.equalAuthor(author));
+//        if (genre != null) spec = spec.and(BookSpecifications.equalGenre(genre));
+//        if (yearFrom != null || yearTo != null) spec = spec.and(BookSpecifications.inYearSpan(yearFrom, yearTo));
+//        Page<Book> books = booksRepository.findAll(spec, pageable);
+//        return BookMapper.map(books);
+//    }
 
-        String author = null;
-        String genre = null;
-        String yearFromS = null;
-        String yearToS = null;
-        if (searchCriteria != null) {
-            author = searchCriteria.get("author");
-            genre = searchCriteria.get("genre");
-            yearFromS = searchCriteria.get("yearFrom");
-            yearToS = searchCriteria.get("yearTo");
-        }
+    public Page<BookDto> findAll(String author, String genre, String yearFromS, String yearToS, Pageable pageable){
         LocalDate yearFrom = yearFromS == null ? null : LocalDate.of(Integer.parseInt(yearFromS),1,1);
         LocalDate yearTo = yearToS == null ? null : LocalDate.of(Integer.parseInt(yearToS),1,1);
 

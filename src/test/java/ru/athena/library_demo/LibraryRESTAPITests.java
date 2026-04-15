@@ -8,7 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.client.EntityExchangeResult;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.context.WebApplicationContext;
-import ru.athena.library_demo.api.dto.BookDto;
+import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.persistence.entity.Book;
 
 import java.net.URI;
@@ -53,7 +53,12 @@ public class LibraryRESTAPITests {
 
     @Test
     void shouldCreateANewBook() {
-        BookDto newBook = new BookDto(null, "Paradise Lost", "John Milton", "Epic", LocalDate.of(1667,1,1), null);
+        BookDto newBook = new BookDto("Paradise Lost");
+        newBook.setId(null);
+        newBook.setAuthor("John Milton");
+        newBook.setGenre("Epic");
+        newBook.setReleaseDate(LocalDate.of(1667,1,1).toString());
+        newBook.setReservedBy(null);
         URI locationOfNewBook = client.post().uri("/books")
                 .body(newBook)
                 .exchange()
@@ -72,7 +77,12 @@ public class LibraryRESTAPITests {
 
     @Test
     void shouldUpdateAnExistingBook() {
-        BookDto newBook = new BookDto(null, "Paradise Lost", "John Milton", "Epic", LocalDate.of(1667,1,1), null);
+        BookDto newBook = new BookDto("Paradise Lost");
+        newBook.setId(null);
+        newBook.setAuthor("John Milton");
+        newBook.setGenre("Epic");
+        newBook.setReleaseDate(LocalDate.of(1667,1,1).toString());
+        newBook.setReservedBy(null);
         client.put().uri("/books/1")
                 .body(newBook)
                 .exchange()
@@ -95,7 +105,12 @@ public class LibraryRESTAPITests {
 
     @Test
     void shouldCreateANewBookWithPUT() {
-        BookDto newBook = new BookDto(null, "Paradise Lost", "John Milton", "Epic", LocalDate.of(1667,1,1), null);
+        BookDto newBook = new BookDto("Paradise Lost");
+        newBook.setId(null);
+        newBook.setAuthor("John Milton");
+        newBook.setGenre("Epic");
+        newBook.setReleaseDate(LocalDate.of(1667,1,1).toString());
+        newBook.setReservedBy(null);
         client.put().uri("/books/7")
                 .body(newBook)
                 .exchange()

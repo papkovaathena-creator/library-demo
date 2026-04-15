@@ -1,6 +1,6 @@
 package ru.athena.library_demo.exceptions;
 
-public class BookReservedException extends Exception{
+public class BookReservedException extends RuntimeException{
 
     public BookReservedException() {
     }

@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.athena.library_demo.api.controller.LibraryController;
-import ru.athena.library_demo.api.dto.BookDto;
+import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.exceptions.BookReservedException;
 import ru.athena.library_demo.service.LibraryService;
 import tools.jackson.databind.ObjectMapper;
@@ -49,7 +49,12 @@ public class LibraryControllerTests {
 
     @BeforeEach
     public void init(){
-        bookDto = new BookDto(null, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
+        bookDto = new BookDto("Wuthering Heights");
+        bookDto.setId(null);
+        bookDto.setAuthor("Emily Bronte");
+        bookDto.setGenre("Tragedy");
+        bookDto.setReleaseDate(LocalDate.of(1847, 11, 24).toString());
+        bookDto.setReservedBy(null);
     }
 
     @Test

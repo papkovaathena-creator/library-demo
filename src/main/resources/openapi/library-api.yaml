@@ -1,0 +1,296 @@
+# OpenApi for my Library demo
+openapi: 3.0.3
+info:
+  title: OpenApi specification for library-demo
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /books:
+    summary: Operations pertaining books.
+    get:
+      summary: Get all the books.
+      parameters:
+        - name: genre
+          in: query
+          description: Genre of the books
+          schema:
+            type: string
+        - name: author
+          in: query
+          description: Author of the books
+          schema:
+            type: string
+        - name: yearFrom
+          in: query
+          description: Earliest year of the books
+          schema:
+            type: string
+        - name: yearTo
+          in: query
+          description: Latest year of the books
+          schema:
+            type: string
+        - name: pageNo
+          in: query
+          description: Requested page number
+          schema:
+            type: integer
+            default: 0
+            format: int64
+        - name: pageSize
+          in: query
+          description: Requested page size
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+            format: int64
+        - name: sort
+          in: query
+          description: Direction for sorting the response
+          schema:
+            type: string
+            default: '[{"field":"name","direction":"asc"}]'
+      responses:
+        "200":
+          description: Requested set of books.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BookDto"
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  number:
+                    type: integer
+                  size:
+                    type: integer
+    post:
+      summary: Add a new book to the library.
+      requestBody:
+        description: Description of the added book.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookDto"
+      responses:
+        "201":
+          description: The book has been created.
+          headers:
+            Location:
+              schema:
+                type: string
+              description: The URL location of the new book.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookDto"
+        "400":
+          $ref: '#/components/responses/IncorrectBody'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /books/{id}:
+    summary: Operations pertaining to a concrete book represented by an 'id'.
+    get:
+      summary: Return the book by id.
+      parameters:
+        - name: id
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The requested book.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update the book by id, or add a new one.
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Description of the modified book.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookDto"
+      responses:
+        "204":
+          description: Book was modified
+        "400":
+          $ref: "#/components/responses/IncorrectBody"
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      summary: Delete the book by id.
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Book was deleted.
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: '#/components/responses/NotFound'
+  /books/{id}/reserve:
+    summary: Operations for reserving a book represented by an 'id'.
+    post:
+      summary: Reserve the book by id.
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "201":
+          description: The book has been reserved.
+          headers:
+            Location:
+              schema:
+                type: string
+              description: The URL location of the new book.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: '#/components/responses/Conflict'
+  /books/{id}/return:
+    summary: Operations for returning a book represented by an 'id'.
+    post:
+      summary: Return the book by id.
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "201":
+          description: The book has been returned.
+          headers:
+            Location:
+              schema:
+                type: string
+              description: The URL location of the new book.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: '#/components/responses/Conflict'
+
+components:
+  responses:
+    IncorrectBody:
+      description: The request body is incorrect
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: This operation is forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: The operation is unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict of resources
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    BookDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          maxLength: 50
+          pattern: '(.|\s)*\S(.|\s)*'
+        author:
+          type: string
+          maxLength: 50
+        genre:
+          type: string
+          maxLength: 50
+        releaseDate:
+          type: string
+          maxLength: 50
+        reservedBy:
+          type: string
+          maxLength: 50
+      required:
+        - name
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message

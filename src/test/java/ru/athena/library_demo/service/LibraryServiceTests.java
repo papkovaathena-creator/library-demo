@@ -13,7 +13,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import ru.athena.library_demo.api.dto.BookDto;
+import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.exceptions.BookReservedException;
 import ru.athena.library_demo.persistence.entity.Book;
 import ru.athena.library_demo.persistence.repository.BooksRepository;
@@ -39,7 +39,12 @@ public class LibraryServiceTests {
     @Test
     public void LibraryService_SaveBook_ReturnsBookDto(){
         Book book = new Book(null, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
-        BookDto bookDto = new BookDto(null, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
+        BookDto bookDto = new BookDto("Wuthering Heights");
+        bookDto.setId(null);
+        bookDto.setAuthor("Emily Bronte");
+        bookDto.setGenre("Tragedy");
+        bookDto.setReleaseDate(LocalDate.of(1847, 11, 24).toString());
+        bookDto.setReservedBy(null);
 
         when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
 
@@ -51,9 +56,14 @@ public class LibraryServiceTests {
     @Test
     public void LibraryService_PutBook_BookFoundNoException(){
         Book book = new Book(6L, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
-        BookDto bookDto = new BookDto(null, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
+        BookDto bookDto = new BookDto("Wuthering Heights");
+        bookDto.setId(6L);
+        bookDto.setAuthor("Emily Bronte");
+        bookDto.setGenre("Tragedy");
+        bookDto.setReleaseDate(LocalDate.of(1847, 11, 24).toString());
+        bookDto.setReservedBy(null);
 
-        when(booksRepository.findById(6L)).thenReturn(Optional.ofNullable(book));
+        when(booksRepository.findById(6L)).thenReturn(Optional.of(book));
         when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
 
         assertAll(()->libraryService.putBook(bookDto, 6L));
@@ -62,7 +72,12 @@ public class LibraryServiceTests {
     @Test
     public void LibraryService_PutBook_BookNotFoundNoException(){
         Book book = new Book(6L, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
-        BookDto bookDto = new BookDto(null, "Wuthering Heights", "Emily Bronte", "Tragedy", LocalDate.of(1847, 11, 24), null);
+        BookDto bookDto = new BookDto("Wuthering Heights");
+        bookDto.setId(6L);
+        bookDto.setAuthor("Emily Bronte");
+        bookDto.setGenre("Tragedy");
+        bookDto.setReleaseDate(LocalDate.of(1847, 11, 24).toString());
+        bookDto.setReservedBy(null);
 
         when(booksRepository.findById(6L)).thenReturn(Optional.empty());
         when(booksRepository.save(Mockito.any(Book.class))).thenReturn(book);
@@ -158,9 +173,7 @@ public class LibraryServiceTests {
         );
         Page<Book> bookPage = new PageImpl<>(books);
         when(booksRepository.findAll(ArgumentMatchers.any(Specification.class),ArgumentMatchers.any(Pageable.class))).thenReturn(bookPage);
-        Map<String, String> paramMap = new HashMap<>();
-        paramMap.put("genre", "Tragedy");
-        Page<BookDto> bookDtos = libraryService.findAll(paramMap, PageRequest.of(0,10));
+        Page<BookDto> bookDtos = libraryService.findAll("Tragedy", null, null, null, PageRequest.of(0,10));
         Assertions.assertThat(bookDtos.getSize()).isEqualTo(2);
     }
 

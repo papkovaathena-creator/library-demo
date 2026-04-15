@@ -3,8 +3,10 @@ package ru.athena.library_demo.api.dto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
+import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.persistence.entity.Book;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,18 +16,19 @@ public class BookMapper {
 
     public static Optional<BookDto> map(Book book) {
         return Optional.ofNullable(book).
-                flatMap(b -> Optional.of(new BookDto(
-                        b.getId(),
-                        b.getName(),
-                        b.getAuthor(),
-                        b.getGenre(),
-                        b.getReleaseDate(),
-                        b.getReserved()
-                )));
+                flatMap(b -> {
+                    BookDto bookDto = new BookDto(b.getName());
+                    bookDto.setId(b.getId());
+                    bookDto.setGenre(b.getGenre());
+                    bookDto.setAuthor(b.getAuthor());
+                    bookDto.setReleaseDate(b.getReleaseDate().toString());
+                    bookDto.setReservedBy(b.getReserved());
+                    return Optional.of(bookDto);
+                });
     }
 
     public static Book reverseMap(BookDto bookDto) {
-        return new Book(bookDto.getId(), bookDto.getName(), bookDto.getAuthor(), bookDto.getGenre(), bookDto.getReleaseDate(), bookDto.getReservedBy());
+        return new Book(bookDto.getId(), bookDto.getName(), bookDto.getAuthor(), bookDto.getGenre(), LocalDate.parse(bookDto.getReleaseDate()), bookDto.getReservedBy());
     }
 
     public static List<BookDto> map(List<Book> books) {

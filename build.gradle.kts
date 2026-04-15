@@ -8,6 +8,7 @@ plugins {
     java
     id("org.springframework.boot") version "4.1.0-M4"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.openapi.generator") version "7.21.0"
 }
 
 repositories {
@@ -28,6 +29,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.46")
+    implementation("jakarta.validation:jakarta.validation-api")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
@@ -41,6 +44,33 @@ version = "0.0.1-SNAPSHOT"
 description = "library-demo"
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set("$rootDir/src/main/resources/openapi/library-api.yaml")
+    outputDir.set("${layout.buildDirectory.get()}/generated")
+    apiPackage.set("ru.athena.library_demo.api.generated")
+    modelPackage.set("ru.athena.library_demo.api.generated.model")
+    configOptions.set(mapOf(
+        "interfaceOnly" to "true",
+        "useSpringBoot3" to "true",
+        "useTags" to "true",
+        "dateLibrary" to "java8",
+        "openApiNullable" to "false",
+        "skipDefaultInterface" to "false"
+    ))
+}
+
+sourceSets {
+    main {
+        java.srcDir("${layout.buildDirectory.get()}/generated/src/main/java")
+    }
+    test {
+        java {
+            java.srcDir("${layout.buildDirectory.get()}/generated/src/main/java")
+        }
+    }
+}
 
 tasks.named<Jar>("jar") {
     manifest {
@@ -61,6 +91,7 @@ tasks.named<Test>("test") {
 
 tasks.withType<JavaCompile>() {
     options.encoding = "UTF-8"
+    dependsOn(tasks.openApiGenerate)
 }
 
 tasks.withType<Javadoc>() {
