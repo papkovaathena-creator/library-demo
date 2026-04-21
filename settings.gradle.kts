@@ -3,3 +3,5 @@
  */
 
 rootProject.name = "library-demo"
+include("library-api")
+include("library-app")
