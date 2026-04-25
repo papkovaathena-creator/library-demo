@@ -6,6 +6,7 @@ description = "library-api"
 
 plugins {
     `java-library`
+    `maven-publish`
     id("org.openapi.generator") version "7.21.0"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -56,4 +57,15 @@ sourceSets {
 tasks.withType<JavaCompile>() {
     options.encoding = "UTF-8"
     dependsOn(tasks.openApiGenerate)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = "ru.athena"
+            artifactId = "library-api"
+            version = "0.0.1-SNAPSHOT"
+        }
+    }
 }

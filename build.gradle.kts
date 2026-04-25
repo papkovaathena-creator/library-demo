@@ -20,11 +20,11 @@ subprojects {
     java.sourceCompatibility = JavaVersion.VERSION_17
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url = uri("https://company/com/maven2")
         }
-        mavenLocal()
     }
     tasks.withType<JavaCompile> {
         options.compilerArgs.add("-Xlint:deprecation")
