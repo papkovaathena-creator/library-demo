@@ -33,6 +33,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,"/books/**").hasAnyRole("LIBRARIAN")
                         .requestMatchers(HttpMethod.GET,"/books").hasAnyRole("READER","LIBRARIAN")
                         .requestMatchers(HttpMethod.GET,"/actuator/**").hasAnyRole("LIBRARIAN")
+                        .requestMatchers(HttpMethod.GET,"/swagger-ui.html").hasAnyRole("LIBRARIAN")
+                        .requestMatchers(HttpMethod.GET,"/swagger-ui/**").hasAnyRole("LIBRARIAN")
+                        .requestMatchers(HttpMethod.GET,"/v3/api-docs/**").hasAnyRole("LIBRARIAN")
                         .anyRequest().denyAll())
                 .httpBasic(Customizer.withDefaults());
         return http.csrf(AbstractHttpConfigurer::disable).build();

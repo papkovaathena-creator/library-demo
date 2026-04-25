@@ -14,6 +14,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-webmvc:4.1.0-M4")
     implementation("jakarta.validation:jakarta.validation-api:4.0.0-M1")
     implementation("io.swagger.core.v3:swagger-annotations:2.2.46")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 }
 
 openApiGenerate {
