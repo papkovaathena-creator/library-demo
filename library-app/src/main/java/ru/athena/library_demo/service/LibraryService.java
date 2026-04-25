@@ -68,7 +68,7 @@ public class LibraryService {
         Book book = bookOptional.get();
         if (book.getReserved() != null & !reserverName.equals(book.getReserved())) {
             log.error("The book {} by {}(id - {}) is reserved by {}.", book.getName(), book.getAuthor(), book.getId(), reserverName);
-            throw new BookReservedException("This book is reserved by " + reserverName + ".");
+            throw new BookReservedException("This book is reserved by " + book.getReserved() + ".");
         }
         book.setReserved(null);
         log.info("The book {} by {}(id - {}) is successfully returned.", book.getName(), book.getAuthor(), book.getId());

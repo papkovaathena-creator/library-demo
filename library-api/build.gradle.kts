@@ -32,15 +32,23 @@ openApiGenerate {
     ))
 }
 
+tasks.openApiGenerate {
+    doLast {
+        val generatedJava = file("${layout.buildDirectory.get()}/generated/src/main/java")
+        fileTree(generatedJava).matching { include("**/*.java") }.forEach { file ->
+            val original = file.readText()
+            val patched = original
+                .replace(Regex("(?m)^import org\\.springframework\\.lang\\.Nullable;\\r?\\n"), "")
+                .replace("@Nullable ", "")
+            if (patched != original) file.writeText(patched)
+        }
+    }
+}
+
 
 sourceSets {
     main {
         java.srcDir("${layout.buildDirectory.get()}/generated/src/main/java")
-    }
-    test {
-        java {
-            java.srcDir("${layout.buildDirectory.get()}/generated/src/main/java")
-        }
     }
 }
 
