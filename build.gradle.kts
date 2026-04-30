@@ -12,6 +12,11 @@ plugins{
     java
 }
 
+tasks.withType<Jar>() {
+    manifest {
+        attributes["Main-Class"] = "ru.athena.library_demo.LibraryDemoApplication"
+    }
+}
 
 subprojects {
     group = "ru.athena"
