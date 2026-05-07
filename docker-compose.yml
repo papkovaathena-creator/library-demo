@@ -3,6 +3,11 @@ services:
     image: library-backend
     pull_policy: never
     container_name: library-backend
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      postgres:
+        condition: service_started
     build:
       context: .
       dockerfile: Backend.Dockerfile
