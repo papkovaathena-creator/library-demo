@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -22,28 +23,17 @@ public class ElasticsearchConfig {
     ElasticsearchClient elasticsearchClient;
 
     @Bean
-    public ElasticsearchClient getElasticsearchClient() {
-        ElasticsearchClient client = new ElasticsearchClient(getElasticsearchTransport());
-        System.out.println("---------------------------");
-        System.out.println("---------------------------");
-        try {
-            System.out.println("exists -- " + client.cluster().health());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("---------------------------");
-        System.out.println("---------------------------");
-        return client;
+    public ElasticsearchClient elasticsearchClient(ElasticsearchTransport transport) {
+        return new ElasticsearchClient(transport);
     }
 
     @Bean
-    public ElasticsearchTransport getElasticsearchTransport() {
-        return new RestClientTransport(
-                getRestClient(), new JacksonJsonpMapper());
+    public ElasticsearchTransport elasticsearchTransport(RestClient restClient) {
+        return new RestClientTransport(restClient, new JacksonJsonpMapper());
     }
 
     @Bean
-    public RestClient getRestClient() {
-        return RestClient.builder(new HttpHost("172.17.0.1", 9200, "http")).build();
+    public RestClient restClient(@Value("${spring.elasticsearch.uris}") String uri) {
+        return RestClient.builder(HttpHost.create(uri)).build();
     }
 }

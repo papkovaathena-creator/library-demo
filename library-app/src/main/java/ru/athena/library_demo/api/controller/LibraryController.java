@@ -1,6 +1,5 @@
 package ru.athena.library_demo.api.controller;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +17,6 @@ import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.api.generated.model.BooksGet200Response;
 import ru.athena.library_demo.service.LibraryService;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 

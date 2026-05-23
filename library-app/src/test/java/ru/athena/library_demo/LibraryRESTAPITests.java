@@ -18,9 +18,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("hsqldb")
-@Disabled
-public class LibraryRESTAPITests {
+public class LibraryRESTAPITests extends BaseElasticsearchIntegrationTest {
 
     RestTestClient client;
 
