@@ -7,8 +7,20 @@ public class BookDocument {
     private String name;
     private String author;
     private String genre;
-    private LocalDate releaseDate;
+    private String releaseDate;
     private String reservedBy;
+
+    public BookDocument() {
+    }
+
+    public BookDocument(Long id, String name, String author, String genre, String releaseDate, String reservedBy) {
+        this.id = id;
+        this.name = name;
+        this.author = author;
+        this.genre = genre;
+        this.releaseDate = releaseDate;
+        this.reservedBy = reservedBy;
+    }
 
     public Long getId() {
         return id;
@@ -42,11 +54,11 @@ public class BookDocument {
         this.genre = genre;
     }
 
-    public LocalDate getReleaseDate() {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(LocalDate releaseDate) {
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
@@ -56,5 +68,17 @@ public class BookDocument {
 
     public void setReservedBy(String reservedBy) {
         this.reservedBy = reservedBy;
+    }
+
+    @Override
+    public String toString() {
+        return "BookDocument{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", author='" + author + '\'' +
+                ", genre='" + genre + '\'' +
+                ", releaseDate='" + releaseDate + '\'' +
+                ", reservedBy='" + reservedBy + '\'' +
+                '}';
     }
 }
