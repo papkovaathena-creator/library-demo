@@ -1,18 +1,21 @@
 package ru.athena.library_demo.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import ru.athena.library_demo.persistence.entity.Book;
 import ru.athena.library_demo.persistence.repository.BooksRepository;
 import ru.athena.library_demo.service.LibraryService;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 public class BookIndexInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
     private static final Logger log = LoggerFactory.getLogger(LibraryService.class);
+    public static final String BOOKS_INDEX = "books";
     private final ElasticsearchClient client;
     private final BooksRepository booksRepository;
 
@@ -35,26 +39,14 @@ public class BookIndexInitializer implements ApplicationListener<ApplicationRead
     public void onApplicationEvent(ApplicationReadyEvent event) {
         log.info("BookIndexInitializer started -- checking for index.");
         try {
-            if (client.indices().exists(d -> d.index("books")).value()) {
-                log.info("Index \"books\" exists.");
+            if (client.indices().exists(d -> d.index(BOOKS_INDEX)).value()) {
+                log.info("Index {} exists.", BOOKS_INDEX);
             } else {
-                log.info("Index \"books\" doesn't exist.");
-                // This feels awkward. Might be better to create it from JSON file?
-                client.indices().create(
-                        createIndexBuilder -> createIndexBuilder
-                                .index("books")
-                                .mappings(m -> m
-                                        .properties("id", p->p.keyword(k->k))
-                                        .properties("name",p->p
-                                                .text(t->t.analyzer("russian")))
-                                        .properties("author",p->p
-                                                .text(t->t.analyzer("russian")))
-                                        .properties("genre",p->p.keyword(k->k))
-                                        .properties("releaseDate",p->p.date(d->d
-                                                .format("yyyy-MM-dd")))
-                                        .properties("reserved",p->p.keyword(k->k)))
-                );
-                log.info("Index \"books\" created.");
+                log.info("Index {} doesn't exist.", BOOKS_INDEX);
+                try (InputStream mapping = new ClassPathResource("elasticsearch/books-index.json").getInputStream()) {
+                    client.indices().create(c -> c.index(BOOKS_INDEX).withJson(mapping));
+                }
+                log.info("Index {} created.", BOOKS_INDEX);
 
                 List<BookDocument> bookDocuments = pullBooksFromRepository();
 
@@ -63,7 +55,7 @@ public class BookIndexInitializer implements ApplicationListener<ApplicationRead
                 for (BookDocument bookDocument : bookDocuments) {
                     br.operations(op -> op
                             .index(idx -> idx
-                                    .index("books")
+                                    .index(BOOKS_INDEX)
                                     .id(bookDocument.getId().toString())
                                     .document(bookDocument)));
                 }
@@ -71,26 +63,6 @@ public class BookIndexInitializer implements ApplicationListener<ApplicationRead
                 BulkResponse bulkResponse = client.bulk(br.build());
 
                 log.info("Books have been indexed.");
-
-                SearchResponse<BookDocument> searchResponse = client.search(s -> s
-                        .index("books")
-                        .query(q -> q
-                                .match(t -> t
-                                        .field("genre")
-                                        .query("Epic")))
-                        ,BookDocument.class);
-
-                SearchRequest.Builder srb = new SearchRequest.Builder();
-                srb.index("books");
-                srb.query(q -> q
-                        .match(t -> t
-                                .field("genre")
-                                .query("Epic")));
-
-                log.info(srb.build().toString());
-
-                log.info(searchResponse.toString());
-                log.info("Amount of results - " + searchResponse.hits().total().value());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

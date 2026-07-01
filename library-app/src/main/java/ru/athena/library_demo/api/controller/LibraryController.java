@@ -14,7 +14,9 @@ import ru.athena.library_demo.api.dto.SortDto;
 import ru.athena.library_demo.api.dto.SortMapper;
 import ru.athena.library_demo.api.generated.DefaultApi;
 import ru.athena.library_demo.api.generated.model.BookDto;
+import ru.athena.library_demo.api.generated.model.BookSearchResultDto;
 import ru.athena.library_demo.api.generated.model.BooksGet200Response;
+import ru.athena.library_demo.elasticsearch.BookSearchService;
 import ru.athena.library_demo.service.LibraryService;
 
 import java.net.URI;
@@ -24,10 +26,12 @@ import java.util.*;
 public class LibraryController implements DefaultApi {
 
     private final LibraryService libraryService;
+    private final BookSearchService bookSearchService;
 
     @Autowired
-    public LibraryController(LibraryService libraryService) {
+    public LibraryController(LibraryService libraryService, BookSearchService bookSearchService) {
         this.libraryService = libraryService;
+        this.bookSearchService = bookSearchService;
     }
 
 
@@ -204,4 +208,8 @@ public class LibraryController implements DefaultApi {
         return ResponseEntity.ok(booksGet200Response);
     }
 
+    @Override
+    public ResponseEntity<BookSearchResultDto> booksSearchGet(String q, String genre, Integer page, Integer size) {
+        return ResponseEntity.ok(bookSearchService.search(q, genre, page, size));
+    }
 }

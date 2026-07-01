@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.athena.library_demo.api.controller.LibraryController;
 import ru.athena.library_demo.api.generated.model.BookDto;
+import ru.athena.library_demo.elasticsearch.BookSearchService;
 import ru.athena.library_demo.exceptions.BookReservedException;
 import ru.athena.library_demo.service.LibraryService;
 import tools.jackson.databind.ObjectMapper;
@@ -43,6 +44,8 @@ public class LibraryControllerTests {
     private MockMvc mockMvc;
     @MockitoBean
     private LibraryService libraryService;
+    @MockitoBean
+    private BookSearchService bookSearchService;
     @Autowired
     private ObjectMapper objectMapper;
 
