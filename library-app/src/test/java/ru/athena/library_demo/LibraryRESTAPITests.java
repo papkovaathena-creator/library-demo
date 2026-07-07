@@ -1,16 +1,15 @@
 package ru.athena.library_demo;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.client.EntityExchangeResult;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.context.WebApplicationContext;
 import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.persistence.entity.Book;
+import ru.athena.library_demo.search.BaseElasticsearchIntegrationTest;
 
 import java.net.URI;
 import java.time.LocalDate;
