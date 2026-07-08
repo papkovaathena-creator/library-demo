@@ -28,7 +28,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-test")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.assertj:assertj-core")
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.4"))
     testImplementation("org.testcontainers:elasticsearch:1.21.4")
+    testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
 }
 
