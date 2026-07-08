@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/swagger-ui.html").hasAnyRole("LIBRARIAN")
                         .requestMatchers(HttpMethod.GET,"/swagger-ui/**").hasAnyRole("LIBRARIAN")
                         .requestMatchers(HttpMethod.GET,"/v3/api-docs/**").hasAnyRole("LIBRARIAN")
+                        .requestMatchers(HttpMethod.POST,"/admin/**").hasAnyRole("ADMIN")
                         .anyRequest().denyAll())
                 .httpBasic(Customizer.withDefaults());
         return http.csrf(AbstractHttpConfigurer::disable).build();
@@ -51,7 +52,7 @@ public class SecurityConfig {
         List<UserDetails> usersList = new ArrayList<>();
         usersList.add(User.withUsername("Jack").password(encoder.encode("password")).roles("READER").build());
         usersList.add(User.withUsername("Jill").password(encoder.encode("password")).roles("READER").build());
-        usersList.add(User.withUsername("Admin").password(encoder.encode("password")).roles("READER", "LIBRARIAN").build());
+        usersList.add(User.withUsername("Admin").password(encoder.encode("password")).roles("READER", "LIBRARIAN", "ADMIN").build());
         return new InMemoryUserDetailsManager(usersList);
     }
 }

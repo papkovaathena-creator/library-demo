@@ -253,6 +253,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BookSearchResultDto"
+  /admin/reindex:
+    summary: Administrative operations over the search read-model.
+    post:
+      tags:
+        - admin
+      summary: Полная переиндексация каталога из БД (источника правды).
+      operationId: reindex
+      responses:
+        "200":
+          description: Переиндексация выполнена (операция синхронная).
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
 components:
   responses:
