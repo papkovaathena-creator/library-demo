@@ -33,12 +33,25 @@ public class BookSearchTests extends BaseElasticsearchIntegrationTest{
         book.setAuthor("Alexandre Dumas");
         book.setGenre("Adventure");
         book.setReleaseDate(LocalDate.of(1845, 1, 1).toString());
-        libraryService.saveBook(book);
+        long retrievedId = libraryService.saveBook(book).getId();
 
         await().atMost(Duration.ofSeconds(10L)).untilAsserted(() ->
         {
             refresh();
-            assertThat(searchService.search("Trois","Adventure",0,20).getTotalHits()).isEqualTo(1L);
+            assertThat(searchService.search("Trois",null,0,20).getTotalHits()).isEqualTo(1L);
+        });
+
+
+        assertThat(searchService.search("Quatre",null,0,20).getTotalHits()).isEqualTo(0L);
+
+        assertThat(searchService.search("Trois","Adventure",0,20).getTotalHits()).isEqualTo(1L);
+        assertThat(searchService.search("Trois","Play",0,20).getTotalHits()).isEqualTo(0L);
+
+        libraryService.deleteBook(retrievedId);
+        await().atMost(Duration.ofSeconds(10L)).untilAsserted(() ->
+        {
+            refresh();
+            assertThat(searchService.search("Trois",null,0,20).getTotalHits()).isEqualTo(0L);
         });
     }
 
