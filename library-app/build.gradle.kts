@@ -31,6 +31,7 @@ dependencies {
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.4"))
     testImplementation("org.testcontainers:elasticsearch:1.21.4")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation("com.redis:testcontainers-redis")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
 }
 
