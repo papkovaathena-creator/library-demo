@@ -22,6 +22,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("co.elastic.clients:elasticsearch-java:8.13.0")
     implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
@@ -29,9 +30,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.assertj:assertj-core")
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.4"))
-    testImplementation("org.testcontainers:elasticsearch:1.21.4")
+    testImplementation("org.testcontainers:elasticsearch")
     testImplementation("org.testcontainers:postgresql")
-    testImplementation("com.redis:testcontainers-redis")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
 }
 

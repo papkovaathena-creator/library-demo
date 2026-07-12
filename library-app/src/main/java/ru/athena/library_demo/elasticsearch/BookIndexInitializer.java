@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import ru.athena.library_demo.persistence.entity.Book;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class BookIndexInitializer implements ApplicationListener<ApplicationReadyEvent> {
+public class BookIndexInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(LibraryService.class);
     public static final String BOOKS_INDEX = "books";
@@ -35,7 +36,7 @@ public class BookIndexInitializer implements ApplicationListener<ApplicationRead
         this.booksRepository = booksRepository;
     }
 
-    @Override
+    @EventListener(ApplicationReadyEvent.class)
     public void onApplicationEvent(ApplicationReadyEvent event) {
         log.info("BookIndexInitializer started -- checking for index.");
         try {
@@ -65,7 +66,8 @@ public class BookIndexInitializer implements ApplicationListener<ApplicationRead
                 log.info("Books have been indexed.");
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.warn("Wasn't able to create index '{}' on startup (ES unavailable?): {}",
+                    BOOKS_INDEX, e.getMessage());
         }
     }
 

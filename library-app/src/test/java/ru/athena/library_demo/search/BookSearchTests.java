@@ -1,5 +1,6 @@
 package ru.athena.library_demo.search;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +19,6 @@ import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
 import java.time.LocalDate;
-
 
 public class BookSearchTests extends BaseElasticsearchIntegrationTest{
 
