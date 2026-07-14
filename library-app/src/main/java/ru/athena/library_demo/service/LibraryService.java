@@ -3,6 +3,8 @@ package ru.athena.library_demo.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,7 @@ public class LibraryService {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
+    @Cacheable("books")
     public Optional<BookDto> findById(Long id) {
         Optional<Book> bookOptional = booksRepository.findById(id);
         return BookMapper.map(bookOptional.orElse(null));
@@ -46,6 +49,7 @@ public class LibraryService {
         return bookDto;
     }
 
+    @CacheEvict(value = "books", key = "#id")
     public Optional<BookDto> reserveBook(Long id, String reserverName) throws BookReservedException {
         log.info("Attempting to reserve a book {}.", id);
         Optional<Book> bookOptional = booksRepository.findById(id);
@@ -65,6 +69,7 @@ public class LibraryService {
         return BookMapper.map(persisted);
     }
 
+    @CacheEvict(value = "books", key = "#id")
     public Optional<BookDto> returnBook(Long id, String reserverName) throws BookReservedException {
         log.info("Attempting to return a book with id {}.", id);
         Optional<Book> bookOptional = booksRepository.findById(id);
@@ -84,6 +89,7 @@ public class LibraryService {
         return BookMapper.map(persisted);
     }
 
+    @CacheEvict(value = "books", key = "#requestedId")
     public void putBook(BookDto bookUpdate, Long requestedId) {
         log.info("Creating or updating a book - {} by {}.", bookUpdate.getName(), bookUpdate.getAuthor());
         Optional<BookDto> book = this.findById(requestedId);
@@ -96,6 +102,7 @@ public class LibraryService {
         this.saveBook(updatedBook);
     }
 
+    @CacheEvict(value = "books", key = "#id")
     public boolean deleteBook(Long id) throws BookReservedException {
         log.info("Attempting to delete a book with id {}.", id);
         Optional<String> reserved = booksRepository.findFirstReservedById(id);
