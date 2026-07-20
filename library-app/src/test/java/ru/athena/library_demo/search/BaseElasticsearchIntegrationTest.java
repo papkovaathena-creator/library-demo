@@ -9,7 +9,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.io.IOException;
 
@@ -17,10 +16,7 @@ import java.io.IOException;
 @ActiveProfiles("postgres")
 public abstract class BaseElasticsearchIntegrationTest {
 
-
-    @Container
     static final ElasticsearchContainer elasticsearchContainer;
-    @Container
     static final PostgreSQLContainer<?> POSTGRES;
 
     static {

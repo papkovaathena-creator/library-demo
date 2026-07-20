@@ -17,6 +17,7 @@ import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.api.generated.model.BookSearchResultDto;
 import ru.athena.library_demo.api.generated.model.BooksGet200Response;
 import ru.athena.library_demo.elasticsearch.BookSearchService;
+import ru.athena.library_demo.lock.ReservationService;
 import ru.athena.library_demo.service.LibraryService;
 
 import java.net.URI;
@@ -27,12 +28,14 @@ public class LibraryController implements DefaultApi {
 
     private final LibraryService libraryService;
     private final BookSearchService bookSearchService;
+    private final ReservationService reservationService;
 
-    @Autowired
-    public LibraryController(LibraryService libraryService, BookSearchService bookSearchService) {
+    public LibraryController(LibraryService libraryService, BookSearchService bookSearchService, ReservationService reservationService) {
         this.libraryService = libraryService;
         this.bookSearchService = bookSearchService;
+        this.reservationService = reservationService;
     }
+
 
 
 //    @GetMapping("/{requestedId}")
@@ -113,7 +116,7 @@ public class LibraryController implements DefaultApi {
     @Override
     public ResponseEntity<BookDto> booksIdReservePost(Long id) {
         String reserverName = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<BookDto> savedBook = libraryService.reserveBook(id, reserverName);
+        Optional<BookDto> savedBook = reservationService.reserve(id, reserverName);
         UriComponentsBuilder ucb = UriComponentsBuilder.newInstance();
         URI locationOfNewBook = ucb
                 .scheme("http")

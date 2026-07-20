@@ -23,6 +23,7 @@ import ru.athena.library_demo.api.controller.LibraryController;
 import ru.athena.library_demo.api.generated.model.BookDto;
 import ru.athena.library_demo.elasticsearch.BookSearchService;
 import ru.athena.library_demo.exceptions.BookReservedException;
+import ru.athena.library_demo.lock.ReservationService;
 import ru.athena.library_demo.service.LibraryService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -46,6 +47,8 @@ public class LibraryControllerTests {
     private LibraryService libraryService;
     @MockitoBean
     private BookSearchService bookSearchService;
+    @MockitoBean
+    private ReservationService reservationService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -141,7 +144,7 @@ public class LibraryControllerTests {
         given(SecurityContextHolder.getContext().getAuthentication().getName())
                 .willAnswer(invocation -> "Tester");
 
-        given(libraryService.reserveBook(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString())).willAnswer(invocation -> {
+        given(reservationService.reserve(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString())).willAnswer(invocation -> {
             bookDto.setReservedBy("Tester");
             return Optional.of(bookDto);
         });
@@ -166,7 +169,7 @@ public class LibraryControllerTests {
         given(SecurityContextHolder.getContext().getAuthentication().getName())
                 .willAnswer(invocation -> "Tester");
 
-        given(libraryService.reserveBook(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString()))
+        given(reservationService.reserve(ArgumentMatchers.anyLong(), ArgumentMatchers.anyString()))
                 .willAnswer(invocation -> Optional.empty());
 
         ResultActions response = mockMvc.perform(post("/books/" + bookId + "/reserve")
@@ -187,7 +190,7 @@ public class LibraryControllerTests {
         given(SecurityContextHolder.getContext().getAuthentication().getName())
                 .willAnswer(invocation -> "Tester");
 
-        when(libraryService.reserveBook(bookId, "Tester")).thenThrow(new BookReservedException());
+        when(reservationService.reserve(bookId, "Tester")).thenThrow(new BookReservedException());
 
         ResultActions response = mockMvc.perform(post("/books/" + bookId + "/reserve")
                 .contentType(MediaType.APPLICATION_JSON));

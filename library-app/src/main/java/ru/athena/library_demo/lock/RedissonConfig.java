@@ -19,8 +19,9 @@ public class RedissonConfig {
             @Value("${spring.data.redis.host}") String host,
             @Value("${spring.data.redis.port}") int port) throws IOException {
         Config config = new Config();
+        String adressString = "redis://" + host + ":" + port;
         config.useSingleServer()
-                .setAddress("redis://" + host + ":" + port);
+                .setAddress(adressString);
         return Redisson.create(config);
     }
 
