@@ -1,5 +1,6 @@
 package ru.athena.library_demo.cache;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +19,15 @@ import java.time.Duration;
 @EnableCaching
 public class CacheConfig {
 
+
+    private final ObjectProvider<RedisConnectionFactory> redisConnectionFactory;
+
+    public CacheConfig(ObjectProvider<RedisConnectionFactory> redisConnectionFactory) {
+        this.redisConnectionFactory = redisConnectionFactory;
+    }
+
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    public RedisCacheManager cacheManager() {
         GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer.builder()
                 .enableUnsafeDefaultTyping()
                 .enableSpringCacheNullValueSupport()
@@ -28,7 +36,7 @@ public class CacheConfig {
                 .entryTtl(Duration.ofMinutes(5L))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
         return RedisCacheManager.builder()
-                .cacheWriter(RedisCacheWriter.lockingRedisCacheWriter(connectionFactory))
+                .cacheWriter(RedisCacheWriter.lockingRedisCacheWriter(redisConnectionFactory.getObject()))
                 .cacheDefaults(config)
                 .build();
     }

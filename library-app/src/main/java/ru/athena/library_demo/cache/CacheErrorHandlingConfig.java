@@ -3,10 +3,12 @@ package ru.athena.library_demo.cache;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
 
 @Configuration
 public class CacheErrorHandlingConfig implements CachingConfigurer {
